@@ -4,8 +4,29 @@
   <component name="GradleSettings">
     <option name="linkedExternalProjectsSettings">
       <GradleProjectSettings>
+        <option name="delegatedBuild" value="false" />
+        <option name="testRunner" value="PLATFORM" />
         <option name="externalProjectPath" value="$PROJECT_DIR$/backend" />
         <option name="gradleJvm" value="corretto-21 (WSL)" />
+        <option name="modules">
+          <set>
+            <option value="//wsl.localhost/Ubuntu/home/gagle/workspace/backend" />
+          </set>
+        </option>
+      </GradleProjectSettings>
+      <GradleProjectSettings>
+        <option name="delegatedBuild" value="false" />
+        <option name="testRunner" value="PLATFORM" />
+        <option name="distributionType" value="WRAPPED" />
+        <option name="externalProjectPath" value="//wsl.localhost/Ubuntu/home/gagle/workspace" />
+        <option name="modules">
+          <set>
+            <option value="//wsl.localhost/Ubuntu/home/gagle/workspace" />
+          </set>
+        </option>
+      </GradleProjectSettings>
+      <GradleProjectSettings>
+        <option name="externalProjectPath" value="//wsl.localhost/Ubuntu/home/gagle/workspace/backend" />
         <option name="modules">
           <set>
             <option value="//wsl.localhost/Ubuntu/home/gagle/workspace/backend" />

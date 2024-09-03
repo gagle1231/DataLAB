@@ -1,37 +1,33 @@
 package com.onion.backend.controller;
 
+import com.onion.backend.dto.SignupRequest;
 import com.onion.backend.entity.User;
 import com.onion.backend.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/users")
+@RequiredArgsConstructor
 public class UserController {
 
     private final UserService userService;
 
-    @Autowired
-    public UserController(UserService userService) {
-        this.userService = userService;
-    }
-
-    // 사용자 생성
-    @Operation(summary = "Create a new user", description = "Creates a new user with the provided username, password, and email.")
+    @Operation(summary = "Register a new user", description = "Registers a new user with the provided username, password, and email.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "User created successfully"),
+            @ApiResponse(responseCode = "201", description = "User registered successfully"),
             @ApiResponse(responseCode = "400", description = "Invalid input or user already exists")
     })
-    @PostMapping
-    public ResponseEntity<User> createUser(@RequestParam String username, @RequestParam String password, @RequestParam String email) {
+    @PostMapping("/signup")
+    public ResponseEntity<User> registerUser(@RequestBody SignupRequest signupUser) {
         ResponseEntity<User> result;
         try {
-            User newUser = userService.createUser(username, password, email);
+            User newUser = userService.createUser(signupUser);
             result = ResponseEntity
                     .status(HttpStatus.CREATED)
                     .body(newUser);
@@ -41,7 +37,6 @@ public class UserController {
         return result;
     }
 
-    // 사용자 삭제
     @Operation(summary = "Delete a user", description = "Deletes a user by the given ID.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "User deleted successfully"),
@@ -56,4 +51,5 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
+
 }

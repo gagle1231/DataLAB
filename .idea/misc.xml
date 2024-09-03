@@ -3,8 +3,10 @@
   <component name="ExternalStorageConfigurationManager" enabled="true" />
   <component name="FrameworkDetectionExcludesConfiguration">
     <file type="web" url="file://$PROJECT_DIR$/backend" />
+    <file type="web" url="file:////wsl.localhost/Ubuntu/home/gagle/workspace/backend" />
+    <file type="web" url="file://$APPLICATION_HOME_DIR$/jbr/bin/wsl.localhost/Ubuntu/home/gagle/workspace/backend" />
   </component>
-  <component name="ProjectRootManager">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_21" project-jdk-name="corretto-21 (WSL)" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/out" />
   </component>
 </project>

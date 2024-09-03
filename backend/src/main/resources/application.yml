@@ -10,3 +10,8 @@ spring:
     hibernate:
       ddl-auto: update # 상용에서는 절대 x
 
+jwt:
+  secret: s9TqTmSmZKgJQ3m4Q2yqNcPazPJsD+vRaOq/FshAlqE=
+  expiration: 3600000
+
+
