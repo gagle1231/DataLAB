@@ -30,7 +30,7 @@ public class UserController {
             User newUser = userService.createUser(signupUser);
             result = ResponseEntity
                     .status(HttpStatus.CREATED)
-                    .body(newUser);
+                    .build();
         } catch (IllegalArgumentException e) {
             result = ResponseEntity.badRequest().build();
         }

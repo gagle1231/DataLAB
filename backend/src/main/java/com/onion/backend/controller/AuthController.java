@@ -5,6 +5,8 @@ import com.onion.backend.security.service.AuthenticationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,10 +26,29 @@ public class AuthController {
             @ApiResponse(responseCode = "201", description = "Sign in successfully"),
             @ApiResponse(responseCode = "400", description = "Invalid input or user not exists")
     })
-    @PostMapping("/signin")
-    public ResponseEntity<String> login(@RequestBody LoginRequest user) {
-        String token = authenticationService.login(user.email(), user.password());
+    @PostMapping("/login")
+    public ResponseEntity<String> login(@RequestBody LoginRequest request, HttpServletResponse response) {
+        String token = authenticationService.login(request.email(), request.password());
+        // JWT를 쿠키에 저장
+        Cookie cookie = new Cookie("JWT", token);
+        cookie.setHttpOnly(true);
+        cookie.setSecure(true); // HTTPS에서만 작동하게 설정 (HTTPS 사용 시)
+        cookie.setPath("/"); // 쿠키의 경로 설정
+        cookie.setMaxAge(60 * 60); // 쿠키 만료 시간을 1시간으로 설정
+        response.addCookie(cookie);
         return ResponseEntity.ok(token);
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<String> logout(HttpServletResponse response) {
+        // JWT 쿠키 삭제
+        Cookie cookie = new Cookie("JWT", null);
+        cookie.setHttpOnly(true);
+        cookie.setPath("/"); // 쿠키의 경로 설정
+        cookie.setMaxAge(0); // 쿠키 만료 시간을 0으로 설정하여 삭제
+        response.addCookie(cookie);
+
+        return ResponseEntity.ok("Successfully logged out");
     }
 
     @PostMapping("/token/validation")

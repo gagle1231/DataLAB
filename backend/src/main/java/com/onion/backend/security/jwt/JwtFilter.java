@@ -33,7 +33,6 @@ public class JwtFilter extends OncePerRequestFilter {
         if (authorizationHeader != null && authorizationHeader.startsWith(AUTHORIZATION_TOKEN_TYPE)) {
             token = authorizationHeader.substring(7);
             email = jwtUtil.extractEmail(token);
-            log.info("=======!!==========");
         }
 
         if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
@@ -47,5 +46,14 @@ public class JwtFilter extends OncePerRequestFilter {
         }
 
         filterChain.doFilter(request, response);
+    }
+
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+        String path = request.getRequestURI();
+        if(path.startsWith("/api/users/signup") || path.startsWith("/api/auth/signin")){
+            return true;
+        }
+        return false;
     }
 }
