@@ -1,5 +1,6 @@
 package com.onion.backend.security.jwt;
 
+import com.onion.backend.security.service.TokenBlacklistService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -21,27 +22,28 @@ public class JwtFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
     private final UserDetailsService userDetailsService;
-    private static String AUTHORIZATION_HEADER = "Authorization";
-    private static String AUTHORIZATION_TOKEN_TYPE = "Bearer ";
+    private final TokenBlacklistService tokenBlacklistService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        final String authorizationHeader = request.getHeader(AUTHORIZATION_HEADER);
-        String email = null;
-        String token = null;
+        String token = jwtUtil.getToken(request);
 
-        if (authorizationHeader != null && authorizationHeader.startsWith(AUTHORIZATION_TOKEN_TYPE)) {
-            token = authorizationHeader.substring(7);
-            email = jwtUtil.extractEmail(token);
+        if(token == null || token.isEmpty()) {
+            throw new ServletException("Missing JWT token");
         }
 
-        if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = userDetailsService.loadUserByUsername(email);
-
-            if (jwtUtil.validateToken(token, email)) {
-                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                        userDetails, null, userDetails.getAuthorities());
-                SecurityContextHolder.getContext().setAuthentication(authToken);
+        if(tokenBlacklistService.isTokenBlacklisted(token)){
+            throw new ServletException("This token is blacklisted");
+        }
+        if(jwtUtil.validateToken(token)){
+            String email = jwtUtil.extractEmail(token);
+            if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                UserDetails userDetails = userDetailsService.loadUserByUsername(email);
+                if (jwtUtil.validateToken(token, email)) {
+                    UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                            userDetails, null, userDetails.getAuthorities());
+                    SecurityContextHolder.getContext().setAuthentication(authToken);
+                }
             }
         }
 
@@ -51,9 +53,13 @@ public class JwtFilter extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
         String path = request.getRequestURI();
-        if(path.startsWith("/api/users/signup") || path.startsWith("/api/auth/signin")){
+        log.info(path);
+        if(path.startsWith("/api/users/signup") || path.startsWith("/api/auth/login") ||
+                path.startsWith("/swagger-ui/") || path.startsWith("/v3/api-docs")){
+            log.info("===========not filtered===============");
             return true;
         }
         return false;
     }
+
 }
