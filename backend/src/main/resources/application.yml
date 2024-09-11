@@ -2,16 +2,16 @@ spring:
   application:
     name: backend
   datasource:
-    url: jdbc:mysql://localhost:3307/onion-db
-    username: onion-user
-    password: Wannabe1231!!
+    url: 
+    username: 
+    password: 
     driver-class-name: com.mysql.jdbc.Driver
   jpa:
     hibernate:
       ddl-auto: update # 상용에서는 절대 x
 
 jwt:
-  secret: s9TqTmSmZKgJQ3m4Q2yqNcPazPJsD+vRaOq/FshAlqE=
+  secret: 
   expiration: 3600000
 
 
