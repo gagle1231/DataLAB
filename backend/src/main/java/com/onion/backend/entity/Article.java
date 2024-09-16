@@ -3,14 +3,10 @@ package com.onion.backend.entity;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
-
-import java.time.LocalDateTime;
 
 @Entity
 @NoArgsConstructor
-public class Article {
+public class Article extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,13 +26,6 @@ public class Article {
     @Lob
     @Column(nullable = false)
     private String content;
-
-    @CreatedDate
-    @Column(insertable = false, updatable = false)
-    private LocalDateTime createdDate;
-
-    @LastModifiedDate
-    private LocalDateTime modifiedDate;
 
     @Builder
     public Article(String title, User author, Board board, String content) {
