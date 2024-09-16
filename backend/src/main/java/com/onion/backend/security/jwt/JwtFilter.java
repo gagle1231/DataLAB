@@ -3,6 +3,7 @@ package com.onion.backend.security.jwt;
 import com.onion.backend.security.service.TokenBlacklistService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -27,14 +28,23 @@ public class JwtFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String token = jwtUtil.getToken(request);
-
         if(token == null || token.isEmpty()) {
+            for (Cookie cookie : request.getCookies()) {
+                if (cookie.getName().equals("jwt_token")) {
+                    token = cookie.getValue();
+                    break;
+                }
+            }
+        }
+
+        if(token == null) {
             throw new ServletException("Missing JWT token");
         }
 
         if(tokenBlacklistService.isTokenBlacklisted(token)){
             throw new ServletException("This token is blacklisted");
         }
+
         if(jwtUtil.validateToken(token)){
             String email = jwtUtil.extractEmail(token);
             if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
@@ -53,10 +63,8 @@ public class JwtFilter extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
         String path = request.getRequestURI();
-        log.info(path);
         if(path.startsWith("/api/users/signup") || path.startsWith("/api/auth/login") ||
                 path.startsWith("/swagger-ui/") || path.startsWith("/v3/api-docs")){
-            log.info("===========not filtered===============");
             return true;
         }
         return false;

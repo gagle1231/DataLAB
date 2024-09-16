@@ -22,23 +22,17 @@ public class AuthenticationService {
 
     private final AuthenticationManager authenticationManager;
     private final JwtUtil jwtUtil;
-    private final CustomUserDetailsService userDetailsService;
-    private final TokenBlacklistService tokenBlacklistService;
 
     public String login(String email, String password) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(email, password));
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         String token = jwtUtil.generateToken(userDetails.getUsername());
-        LocalDateTime expiryDate = jwtUtil.getExpiryDateFromToken(token)
-                .toInstant()
-                .atZone(ZoneId.systemDefault())
-                .toLocalDateTime();
-        tokenBlacklistService.addTokenToBlacklist(token, expiryDate);
         return token;
     }
 
     public boolean validateToken(String token){
         return jwtUtil.validateToken(token);
     }
+
 }
