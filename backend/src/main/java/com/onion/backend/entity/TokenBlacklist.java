@@ -1,6 +1,7 @@
 package com.onion.backend.entity;
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -24,9 +25,14 @@ public class TokenBlacklist {
     @Column(name = "expiry_date", nullable = false)
     private LocalDateTime expiryDate;
 
-    public TokenBlacklist(String token, LocalDateTime expiryDate) {
+    private String email;
+
+    @Builder
+    public TokenBlacklist(String token, LocalDateTime expiryDate, String email) {
         this.token = token;
         this.expiryDate = expiryDate;
+        this.email = email;
     }
+
 }
 
