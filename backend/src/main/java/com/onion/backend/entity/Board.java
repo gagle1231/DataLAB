@@ -26,7 +26,7 @@ public class Board {
     private LocalDateTime createdDate;
 
     @LastModifiedDate
-    private LocalDateTime localDateTime;
+    private LocalDateTime modifiedDate;
 
     @Builder
     public Board(String title, String description) {

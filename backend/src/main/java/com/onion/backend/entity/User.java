@@ -35,7 +35,7 @@ public class User {
     private LocalDateTime createdDate;
 
     @LastModifiedDate
-    private LocalDateTime localDateTime;
+    private LocalDateTime modifiedDate;
 
     public User(String username, String password, String email) {
         this.username = username;
