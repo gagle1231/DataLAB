@@ -1,6 +1,6 @@
 package com.onion.backend.controller;
 
-import com.onion.backend.dto.LoginRequest;
+import com.onion.backend.dto.request.LoginRequest;
 import com.onion.backend.security.service.AuthenticationService;
 import com.onion.backend.security.service.TokenBlacklistService;
 import io.swagger.v3.oas.annotations.Operation;
