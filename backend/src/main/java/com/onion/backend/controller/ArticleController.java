@@ -11,6 +11,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/boards")
 @RequiredArgsConstructor
@@ -21,15 +23,23 @@ public class ArticleController {
 
     @PostMapping("/{boardId}/articles")
     public ResponseEntity<ArticleResponse> getArticles(@PathVariable Long boardId,
-                                               @RequestBody WriteArticleRequest articleRequest,
-                                               @AuthenticationPrincipal UserDetails userDetails) {
-        ArticleResponse article = articleService.writeArticle(articleRequest, userDetails);
+                                                       @RequestBody WriteArticleRequest articleRequest,
+                                                       @AuthenticationPrincipal UserDetails userDetails) {
+        ArticleResponse article = articleService.writeArticle(boardId, articleRequest, userDetails);
         return ResponseEntity.ok(article);
     }
 
-    @GetMapping("/{boardId}/articles/{articleId}")
-    public ResponseEntity<Void> getArticle(@PathVariable Long boardId, @PathVariable Long articleId) {
-
+    @GetMapping("/{boardId}/articles")
+    public ResponseEntity<List<ArticleResponse>> getArticles(@PathVariable Long boardId,
+                                                             @RequestParam(required = false) Long firstId,
+                                                             @RequestParam(required = false) Long lastId) {
+        List<ArticleResponse> articleResponseList = articleService.getTopArticles(boardId, firstId, lastId);
+        return ResponseEntity.ok(articleResponseList);
     }
 
+    @GetMapping("/{boardId}/articles/{articleId}")
+    public ResponseEntity<ArticleResponse> getArticles(@PathVariable Long boardId, @PathVariable Long articleId) {
+        ArticleResponse articleResponse = articleService.getArticle(boardId, articleId);
+        return ResponseEntity.ok(articleResponse);
+    }
 }
