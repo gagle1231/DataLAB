@@ -1,8 +1,8 @@
 package com.onion.backend.repository;
 
 import com.onion.backend.entity.Article;
-import com.onion.backend.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -12,17 +12,21 @@ import java.util.Optional;
 
 public interface ArticleRepository extends JpaRepository<Article, Long> {
 
-    List<Article> findTop10ByBoardIdOrderByCreatedDateDesc(Long boardId);
+    List<Article> findTop10ByBoardIdAndIsDeletedFalseOrderByCreatedDateDesc(Long boardId);
 
-    @Query("select a from Article a where a.board.id = :boardId and a.id > :firstId order by a.id asc")
-    List<Article> findTop10ByBoardIdAndIdGreaterThanOrderByIdAsc(@Param("boardId") Long boardId, @Param("firstId") Long firstId);
+    @Query("select a from Article a where a.board.id = :boardId and a.isDeleted = false and a.id > :firstId order by a.id asc")
+    List<Article> findNextArticles(@Param("boardId") Long boardId, @Param("firstId") Long firstId);
 
-    @Query("select a from Article a where a.board.id = :boardId and a.id < :lastId order by a.id desc")
-    List<Article> findTop10ByBoardIdAndIdLessThanOrderByIdDesc(@Param("boardId") Long boardId, @Param("lastId") Long lastId);
+    @Query("select a from Article a where a.board.id = :boardId and a.isDeleted = false and a.id < :lastId order by a.id desc")
+    List<Article> findPreviousArticles(@Param("boardId") Long boardId, @Param("lastId") Long lastId);
 
-    @Query("select a.createdDate from Article a where a.author.email = :email order by a.createdDate desc limit 1")
-    Optional<LocalDateTime> findLatestCreatedArticleByAuthor(@Param("email") String email);
+    @Query("select a.createdDate from Article a where a.author.email = :email and a.isDeleted = false order by a.createdDate desc")
+    Optional<LocalDateTime> findLatestCreatedArticleDate(@Param("email") String email);
 
-    @Query("select a.modifiedDate from Article a where a.author.email = :email order by a.modifiedDate desc limit 1")
-    Optional<LocalDateTime> findLatestUpdatedArticleByAuthor(@Param("email") String email);
+    @Query("select a.modifiedDate from Article a where a.author.email = :email and a.isDeleted = false order by a.modifiedDate desc")
+    Optional<LocalDateTime> findLatestUpdatedArticleDate(@Param("email") String email);
+
+    @Modifying
+    @Query("UPDATE Article a SET a.isDeleted = true WHERE a.id = :id")
+    void softDeleteById(@Param("id") Long id);
 }

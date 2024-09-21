@@ -52,4 +52,12 @@ public class ArticleController {
         ArticleResponse articleResponse = articleService.updateArticle(boardId, articleId, articleRequest, userDetails);
         return ResponseEntity.ok(articleResponse);
     }
+
+    @DeleteMapping("/{boardId}/articles/{articleId}")
+    public ResponseEntity<Void> deleteArticle(@PathVariable Long boardId,
+                                              @PathVariable Long articleId,
+                                              @AuthenticationPrincipal UserDetails userDetails) {
+        articleService.deleteArticle(boardId, articleId, userDetails);
+        return ResponseEntity.noContent().build();
+    }
 }

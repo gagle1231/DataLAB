@@ -30,8 +30,11 @@ public class Article extends BaseEntity {
     @Column(nullable = false)
     private String content;
 
+    @Column(nullable = false)
+    private boolean isDeleted = false;
+
     @Builder
-    public Article(String title, User author, Board board, String content) {
+    public Article(String title, User author, Board board, String content, boolean isDeleted) {
         this.title = title;
         this.author = author;
         this.board = board;
