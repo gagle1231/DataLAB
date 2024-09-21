@@ -1,5 +1,6 @@
 package com.onion.backend.security.jwt;
 
+import com.onion.backend.exception.NoAuthorizationException;
 import com.onion.backend.security.service.TokenBlacklistService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -38,11 +39,11 @@ public class JwtFilter extends OncePerRequestFilter {
         }
 
         if(token == null) {
-            throw new ServletException("Missing JWT token");
+            throw new NoAuthorizationException("Missing JWT token");
         }
 
         if(tokenBlacklistService.isTokenBlacklisted(token)){
-            throw new ServletException("This token is blacklisted");
+            throw new NoAuthorizationException("This token is blacklisted");
         }
 
         if(jwtUtil.validateToken(token)){
