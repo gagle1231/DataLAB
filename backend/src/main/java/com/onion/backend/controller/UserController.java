@@ -1,6 +1,6 @@
 package com.onion.backend.controller;
 
-import com.onion.backend.dto.SignupRequest;
+import com.onion.backend.dto.request.SignupRequest;
 import com.onion.backend.entity.User;
 import com.onion.backend.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;

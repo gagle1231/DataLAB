@@ -1,11 +1,10 @@
 package com.onion.backend.service;
 
-import com.onion.backend.dto.SignupRequest;
+import com.onion.backend.dto.request.SignupRequest;
 import com.onion.backend.entity.User;
 import com.onion.backend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.Optional;
