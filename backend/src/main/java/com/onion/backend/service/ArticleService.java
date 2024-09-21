@@ -1,5 +1,6 @@
 package com.onion.backend.service;
 
+import com.onion.backend.dto.request.UpdateArticleRequest;
 import com.onion.backend.dto.request.WriteArticleRequest;
 import com.onion.backend.dto.response.ArticleResponse;
 import com.onion.backend.entity.Article;
@@ -69,4 +70,18 @@ public class ArticleService {
         return new ArticleResponse(article);
     }
 
+    @Transactional
+    public ArticleResponse updateArticle(Long boardId, Long articleId, UpdateArticleRequest articleRequest, UserDetails userDetails) {
+        Board board = boardRepository.findById(boardId)
+                .orElseThrow(() -> new ResourceNotFoundException("해당 게시판을 찾을 수 없습니다"));
+
+        User author = userRepository.findByEmail(userDetails.getUsername())
+                .orElseThrow( ()-> {
+                    throw new ResourceNotFoundException("사용자를 찾을 수 없습니다.");
+                });
+        Article article = articleRepository.findById(articleId).orElseThrow();
+        article.update(articleRequest);
+        articleRepository.save(article);
+        return new ArticleResponse(article);
+    }
 }

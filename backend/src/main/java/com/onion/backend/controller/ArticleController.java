@@ -1,5 +1,6 @@
 package com.onion.backend.controller;
 
+import com.onion.backend.dto.request.UpdateArticleRequest;
 import com.onion.backend.dto.request.WriteArticleRequest;
 import com.onion.backend.dto.response.ArticleResponse;
 import com.onion.backend.entity.Article;
@@ -40,6 +41,15 @@ public class ArticleController {
     @GetMapping("/{boardId}/articles/{articleId}")
     public ResponseEntity<ArticleResponse> getArticles(@PathVariable Long boardId, @PathVariable Long articleId) {
         ArticleResponse articleResponse = articleService.getArticle(boardId, articleId);
+        return ResponseEntity.ok(articleResponse);
+    }
+
+    @PutMapping("/{boardId}/articles/{articleId}")
+    public ResponseEntity<ArticleResponse> updateArticle(@PathVariable Long boardId,
+                                                         @PathVariable Long articleId,
+                                                         @RequestBody UpdateArticleRequest articleRequest,
+                                                         @AuthenticationPrincipal UserDetails userDetails) {
+        ArticleResponse articleResponse = articleService.updateArticle(boardId, articleId, articleRequest, userDetails);
         return ResponseEntity.ok(articleResponse);
     }
 }

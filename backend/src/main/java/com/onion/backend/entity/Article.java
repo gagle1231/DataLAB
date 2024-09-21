@@ -1,11 +1,14 @@
 package com.onion.backend.entity;
 
+import com.onion.backend.dto.request.UpdateArticleRequest;
 import jakarta.persistence.*;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @NoArgsConstructor
+@Getter
 public class Article extends BaseEntity {
 
     @Id
@@ -33,5 +36,10 @@ public class Article extends BaseEntity {
         this.author = author;
         this.board = board;
         this.content = content;
+    }
+
+    public void update(UpdateArticleRequest articleRequest) {
+        articleRequest.title().ifPresent(newTitle -> this.title = newTitle);
+        articleRequest.content().ifPresent(newContent -> this.content = newContent);
     }
 }
