@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(BaseException.class)
-    public ResponseEntity<ErrorResponse> handleResourceNotFoundException(BaseException ex) {
+    public ResponseEntity<ErrorResponse> handleGlobalException(BaseException ex) {
         ErrorResponse errorResponse = ErrorResponse.create(ex, ex.getStatus(), ex.getMessage());
         log.error(ex.getStatus()+":: "+ex.getMessage());
         return new ResponseEntity<>(errorResponse, ex.getStatus());
