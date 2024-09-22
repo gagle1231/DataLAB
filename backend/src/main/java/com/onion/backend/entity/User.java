@@ -1,6 +1,8 @@
 package com.onion.backend.entity;
 
+import com.onion.backend.dto.request.SignupRequest;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -39,6 +41,7 @@ public class User extends BaseEntity {
     @Column(name = "modified_date")
     private LocalDateTime modifiedDate;
 
+    @Builder
     public User(String username, String password, String email) {
         this.username = username;
         this.password = password;
