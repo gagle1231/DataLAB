@@ -27,7 +27,13 @@ public class UserService {
             throw new IllegalArgumentException("Email already exists.");
         }
         String encryptedPassword = passwordEncoder.encode(signupUser.password());
-        User newUser = new User(signupUser.username(), encryptedPassword, signupUser.email());
+
+        User newUser = User.builder()
+                .email(signupUser.email())
+                .username(signupUser.username())
+                .password(encryptedPassword)
+                .build();
+
         return userRepository.save(newUser);
     }
 
