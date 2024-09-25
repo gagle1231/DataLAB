@@ -13,6 +13,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 @RestController
 @RequestMapping("/api/boards")
@@ -39,8 +40,10 @@ public class ArticleController {
     }
 
     @GetMapping("/{boardId}/articles/{articleId}")
-    public ResponseEntity<ArticleResponse> getArticles(@PathVariable Long boardId, @PathVariable Long articleId) {
-        ArticleResponse articleResponse = articleService.getArticle(boardId, articleId);
+    public ResponseEntity<ArticleResponse> getArticles(@PathVariable Long boardId,
+                                                                          @PathVariable Long articleId) {
+        ArticleResponse articleResponse = articleService.getArticleWithComments(boardId, articleId)
+                .resultNow();
         return ResponseEntity.ok(articleResponse);
     }
 
