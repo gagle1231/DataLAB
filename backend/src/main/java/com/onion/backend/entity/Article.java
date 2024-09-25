@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Entity
 @NoArgsConstructor
 @Getter
@@ -29,6 +31,10 @@ public class Article extends BaseEntity {
     @Lob
     @Column(nullable = false)
     private String content;
+
+    @OneToMany
+    @JoinColumn(foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    private List <Comment> commentList;
 
     @Column(nullable = false)
     private boolean isDeleted = false;
