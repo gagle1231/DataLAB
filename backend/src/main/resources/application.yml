@@ -6,6 +6,13 @@ spring:
     username: root
     password: Wannabe1231!!
     driver-class-name: com.mysql.jdbc.Driver
+    hikari:
+      connection-timeout: 30000            # 연결 타임아웃 (ms)
+      minimum-idle: 5                       # 최소 유휴 연결 수
+      maximum-pool-size: 20                 # 최대 풀 크기
+      idle-timeout: 600000                  # 유휴 연결 타임아웃 (ms)
+      max-lifetime: 1800000                 # 최대 수명 (ms)
+      validation-timeout: 5000              # 유효성 검사 타임아웃 (ms)
   jpa:
     hibernate:
       ddl-auto: update

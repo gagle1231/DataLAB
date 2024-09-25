@@ -3,17 +3,21 @@ package com.onion.backend.service;
 import com.onion.backend.dto.request.UpdateArticleRequest;
 import com.onion.backend.dto.request.WriteArticleRequest;
 import com.onion.backend.dto.response.ArticleResponse;
+import com.onion.backend.dto.response.CommentResponse;
 import com.onion.backend.entity.Article;
 import com.onion.backend.entity.Board;
+import com.onion.backend.entity.Comment;
 import com.onion.backend.entity.User;
 import com.onion.backend.exception.ForbiddenException;
 import com.onion.backend.exception.RateLimitException;
 import com.onion.backend.exception.ResourceNotFoundException;
 import com.onion.backend.repository.ArticleRepository;
 import com.onion.backend.repository.BoardRepository;
+import com.onion.backend.repository.CommentRepository;
 import com.onion.backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,6 +26,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 @Service
@@ -32,6 +37,7 @@ public class ArticleService {
     private final ArticleRepository articleRepository;
     private final BoardRepository boardRepository;
     private final UserRepository userRepository;
+    private final CommentRepository commentRepository;
 
     @Transactional
     public ArticleResponse writeArticle(Long boardId, WriteArticleRequest request, UserDetails userDetails) {
@@ -47,7 +53,7 @@ public class ArticleService {
                 .content(request.content())
                 .build();
 
-        return new ArticleResponse(articleRepository.save(article));
+        return ArticleResponse.of(articleRepository.save(article));
     }
 
     public List<ArticleResponse> getTopArticles(Long boardId, Long firstId, Long lastId) {
@@ -61,13 +67,38 @@ public class ArticleService {
         }
 
         return articles.stream()
-                .map(ArticleResponse::new)
+                .map(ArticleResponse::of)
                 .collect(Collectors.toList());
     }
 
-    public ArticleResponse getArticle(Long boardId, Long articleId) {
+    @Async
+    protected CompletableFuture<Article> getArticle(Long boardId, Long articleId) {
+        findBoardById(boardId);
         Article article = findArticleById(articleId);
-        return new ArticleResponse(article);
+        return CompletableFuture.completedFuture(article);
+    }
+
+    @Async
+    protected CompletableFuture<List<Comment>> getCommentList(Long articleId) {
+        List<Comment> comments = commentRepository.findByArticleIAndId(articleId);
+        return CompletableFuture.completedFuture(comments);
+    }
+
+    public CompletableFuture<ArticleResponse> getArticleWithComments(Long boardId, Long articleId) {
+        CompletableFuture<Article> articleFuture = this.getArticle(boardId, articleId);
+        CompletableFuture<List<Comment>> commentListFuture = this.getCommentList(articleId);
+
+        return CompletableFuture.allOf(articleFuture, commentListFuture)
+                .thenApply(voidResult -> {
+                    Article article = articleFuture.join();
+                    List<CommentResponse> comments = commentListFuture.join()
+                            .stream().map(CommentResponse::of)
+                            .collect(Collectors.toList());
+                    return ArticleResponse.of(article, comments);
+                }).exceptionally(ex -> {
+                    ex.printStackTrace();
+                    throw new IllegalArgumentException("internal error occurs");
+                });
     }
 
     @Transactional
@@ -82,7 +113,7 @@ public class ArticleService {
         checkArticleOwnership(article, author);
         article.update(articleRequest);
         articleRepository.save(article);
-        return new ArticleResponse(article);
+        return ArticleResponse.of(article);
     }
 
     @Transactional
@@ -101,8 +132,12 @@ public class ArticleService {
     }
 
     private Article findArticleById(Long articleId) {
-        return articleRepository.findById(articleId)
+        Article article = articleRepository.findById(articleId)
                 .orElseThrow(() -> new ResourceNotFoundException("Article not found."));
+        if(article.isDeleted()){
+            throw new ResourceNotFoundException("Article not found.");
+        }
+        return article;
     }
 
     private Board findBoardById(Long boardId) {
