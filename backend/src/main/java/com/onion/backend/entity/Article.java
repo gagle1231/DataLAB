@@ -51,4 +51,8 @@ public class Article extends BaseEntity {
         articleRequest.title().ifPresent(newTitle -> this.title = newTitle);
         articleRequest.content().ifPresent(newContent -> this.content = newContent);
     }
+
+    public void softDelete() {
+        this.isDeleted = true;
+    }
 }
