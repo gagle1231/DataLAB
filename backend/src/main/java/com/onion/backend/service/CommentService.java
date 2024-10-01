@@ -48,11 +48,6 @@ public class CommentService {
                                 UserDetails userDetails) {
         Board board = findBoardById(boardId);
         Article article = findArticleById(articleId);
-
-        if (article.isDeleted()) {
-            throw new ResourceNotFoundException("Article has been deleted");
-        }
-
         User author = findUserByEmail(userDetails.getUsername());
 
         if (!validateCommentCreation(author.getEmail())) {
@@ -85,9 +80,7 @@ public class CommentService {
                             UserDetails userDetails) {
         validateBoardAndArticleExistence(boardId, articleId);
         Comment comment = findCommentById(articleId, commentId);
-        if (comment.isDeleted()) {
-            throw new ResourceNotFoundException("Comment has been deleted");
-        }
+
         User author = findUserByEmail(userDetails.getUsername());
         validateCommentAuthor(comment, author);
         if (!validateCommentCreation(author.getEmail())) {
@@ -142,13 +135,22 @@ public class CommentService {
     }
 
     private Article findArticleById(Long articleId) {
-        return articleRepository.findById(articleId)
+        Article article = articleRepository.findById(articleId)
                 .orElseThrow(() -> new ResourceNotFoundException("Article not found"));
+
+        if (article.isDeleted()) {
+            throw new ResourceNotFoundException("Article has been deleted");
+        }
+        return article;
     }
 
     private Comment findCommentById(Long articleId, Long commentId) {
-        return commentRepository.findByArticleIdAndId(articleId, commentId)
+        Comment comment = commentRepository.findByArticleIdAndId(articleId, commentId)
                 .orElseThrow(() -> new ResourceNotFoundException("Comment not found"));
+        if (comment.isDeleted()) {
+            throw new ResourceNotFoundException("Comment has been deleted");
+        }
+        return comment;
     }
 
     private User findUserByEmail(String email) {

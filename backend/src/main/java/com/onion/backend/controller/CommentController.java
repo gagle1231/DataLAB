@@ -43,7 +43,7 @@ public class CommentController {
                                               @PathVariable Long commentId,
                                               @AuthenticationPrincipal UserDetails userDetails) {
         commentService.deleteComment(boardId, articleId, commentId, userDetails);
-        return ResponseEntity.status(HttpStatus.OK)
+        return ResponseEntity.noContent()
                 .build();
     }
 }
