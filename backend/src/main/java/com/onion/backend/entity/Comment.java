@@ -44,4 +44,7 @@ public class Comment extends BaseEntity {
         this.isDeleted = true;
     }
 
+    public void sectContent(String content) {
+        this.content = content;
+    }
 }
