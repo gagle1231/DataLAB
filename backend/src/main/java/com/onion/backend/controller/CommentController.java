@@ -25,4 +25,25 @@ public class CommentController {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .build();
     }
+
+    @PutMapping("/{commentId}")
+    public ResponseEntity<Void> editComment(@PathVariable Long boardId,
+                                            @PathVariable Long articleId,
+                                            @PathVariable Long commentId,
+                                            @RequestBody CommentRequest commentRequest,
+                                            @AuthenticationPrincipal UserDetails userDetails) {
+        commentService.editComment(boardId, articleId, commentId, commentRequest, userDetails);
+        return ResponseEntity.status(HttpStatus.OK)
+                .build();
+    }
+
+    @DeleteMapping("/{commentId}")
+    public ResponseEntity<Void> deleteComment(@PathVariable Long boardId,
+                                              @PathVariable Long articleId,
+                                              @PathVariable Long commentId,
+                                              @AuthenticationPrincipal UserDetails userDetails) {
+        commentService.deleteComment(boardId, articleId, commentId, userDetails);
+        return ResponseEntity.status(HttpStatus.OK)
+                .build();
+    }
 }
